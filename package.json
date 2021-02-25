@@ -2,7 +2,7 @@
   "name": "projeto_rocketz",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "MIT", 
   "scripts": {
     "dotenv": "dotenv/config dist/main.js dotenv_config_path=.env",
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts && npm run dotenv",
