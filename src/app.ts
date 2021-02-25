@@ -1,13 +1,14 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import express from 'express';
+import createConnection from './database';
 import './database';
 import { router } from './routes';
-
+createConnection();
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+
 
 app.use(express.json());
 app.use(router);
 
-export { app, port };
+export { app };
