@@ -3,6 +3,8 @@ import { getCustomRepository } from "typeorm";
 import { SurveysRepository } from "../repositories/SurveysRepository";
 import { SurveysUsersRepository } from "../repositories/SurveysUsersRepository";
 import { UsersRepository } from "../repositories/UsersRepository";
+import SendMailService from "../services/SendMailService";
+import { resolve } from 'path';
 
 class SendMailController {
   async execute(req: Request, res: Response) {
@@ -26,12 +28,33 @@ class SendMailController {
       });
     }
 
+    const variables = {
+      name: user.name,
+      title: survey.title,
+      description: survey.description,
+      id: "",
+      link: process.env.URL_MAIL
+    };
+    const npsPath = resolve(__dirname, '..', 'views', 'emails', 'npsMails.hbs');
+    const surveyUser = await surveysUsersRepository.findOne({
+      where: [{ user_id: user.id, value: null }],
+      relations: ["user", "survey"]
+    });
+
+    if (surveyUser) {
+      variables.id = surveyUser.id;
+      await SendMailService.execute(email, survey.title, variables, npsPath);
+      return res.json(surveyUser);
+    }
+
     const newSurveyUser = surveysUsersRepository.create({
       user_id: user.id,
       survey_id: survey.id
     });
 
     await surveysUsersRepository.save(newSurveyUser);
+
+    await SendMailService.execute(email, survey.title, variables, npsPath);
 
     return res.json(newSurveyUser);
   }
